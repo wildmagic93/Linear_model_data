@@ -1,0 +1,58 @@
+import codecademylib3_seaborn
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import pandas as pd
+
+df = pd.read_csv('data.csv')
+df = df[df['Lake'] == 'lake_poma']
+
+poma = pd.read_csv('Lake_Poma.csv')
+
+print(df.head())
+
+#total = pd.
+
+months = {
+  'January': 1,
+  'February': 2,
+  'March': 3,
+  'April': 4,
+  'May': 5,
+  'June': 6,
+  'July': 7,
+  'August': 8,
+  'September': 9,
+  'October': 10,
+  'November': 11,
+  'December': 12
+}
+df['month_digit'] = df['Month'].apply(lambda row: months[row])
+#print(df.head())
+
+df['x_value'] = df['month_digit'] * df['tilt_max']
+
+#print(df.head())
+plt.scatter(np.array(df['x_value']), np.array(df['tilted_ghi_max']))
+plt.xlabel('Input combination')
+plt.ylabel('Maximum GHI value (kWh / m2)')
+plt.title('Input and output data comparison')
+plt.show()
+
+train_data, test_data, train_value, test_value = train_test_split(np.array(df['x_value']).reshape(-1, 1), np.array(df['tilted_ghi_max']).reshape(-1, 1), train_size = 0.8, test_size = 0.2, random_state = 0)
+
+model = LinearRegression()
+model.fit(train_data, train_value)
+print(model.score(test_data, test_value))
+
+plt.clf()
+
+predicted_data = np.array(model.predict(test_data))
+plt.plot(np.array(test_value), predicted_data)
+plt.xlabel('Input test data combination')
+plt.ylabel('Predicted GHI value (kWh / m2)')
+plt.title('Predicted and real data comparison')
+
+plt.scatter(np.array(test_data), np.array(test_value), color = 'red')
+plt.show()
